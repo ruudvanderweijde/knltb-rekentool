@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KNLTB Padel Rekentool</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <span class="logo">🎾</span>
+      <div>
+        <h1>KNLTB Padel Rekentool</h1>
+        <div class="subtitle">DSS ratingwijziging berekenen</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Spelers</h2>
+      <div class="teams">
+        <div class="team">
+          <h3>Team 1</h3>
+          <div class="player-row">
+            <label class="player-label" for="r1">Speler 1</label>
+            <input type="text" id="r1" class="rating-input" placeholder="bijv. 5,1234">
+          </div>
+          <div class="player-row">
+            <label class="player-label" for="r2">Speler 2</label>
+            <input type="text" id="r2" class="rating-input" placeholder="bijv. 6,0000">
+          </div>
+          <div class="combined-row">Gecombineerd: <strong id="r12">—</strong></div>
+        </div>
+        <div class="vs-divider">VS</div>
+        <div class="team">
+          <h3>Team 2</h3>
+          <div class="player-row">
+            <label class="player-label" for="r3">Speler 3</label>
+            <input type="text" id="r3" class="rating-input" placeholder="bijv. 5,8000">
+          </div>
+          <div class="player-row">
+            <label class="player-label" for="r4">Speler 4</label>
+            <input type="text" id="r4" class="rating-input" placeholder="bijv. 4,8000">
+          </div>
+          <div class="combined-row">Gecombineerd: <strong id="r34">—</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="probSection" hidden>
+      <h2>Winstverwachting</h2>
+      <div class="prob-bar-wrapper">
+        <span class="prob-team" id="probLabel1">—</span>
+        <div class="prob-bar">
+          <div class="prob-fill" id="probFill" style="width: 50%"></div>
+        </div>
+        <span class="prob-team right" id="probLabel2">—</span>
+      </div>
+      <div class="prob-labels">
+        <span id="probName1">Team 1</span>
+        <span id="probName2">Team 2</span>
+      </div>
+    </section>
+
+    <section class="card" id="resultsSection" hidden>
+      <h2>Ratingwijziging per uitslag</h2>
+      <p class="note">Lager = beter &middot; <span class="delta-good">groen = verbetering</span> &middot; <span class="delta-bad">rood = verslechtering</span> &middot; bron: nlpadel.nl rekentool</p>
+
+      <div class="matrix-group">
+        <h3 class="group-header win-header">Team 1 wint</h3>
+        <div class="table-wrapper">
+          <table class="matrix-table">
+            <thead id="winHead"></thead>
+            <tbody id="winBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="matrix-group">
+        <h3 class="group-header loss-header">Team 2 wint</h3>
+        <div class="table-wrapper">
+          <table class="matrix-table">
+            <thead id="lossHead"></thead>
+            <tbody id="lossBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="noResultsHint" hidden>
+      <h2>Ratingwijziging per uitslag</h2>
+      <p class="note">Open de calculator via <code>node scripts/knltb-fetch-ratings.js "&lt;head-2-head URL&gt;" --open</code> om de wijzigingen per uitslag te zien. De berekening komt van de nlpadel.nl rekentool.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Gebaseerd op DSS-parameters KNLTB &middot; q = 2,012 &middot; K = 0,275 &middot; &theta; = 0,5</p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="scenarios.js"></script>
+  <script src="calculator.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
