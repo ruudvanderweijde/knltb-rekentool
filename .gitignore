@@ -17,3 +17,7 @@ scripts/*.png
 scripts/result-page.html
 examples/
 *.tmp
+
+# web-ext build/sign artifacts
+dist/
+web-ext-artifacts/

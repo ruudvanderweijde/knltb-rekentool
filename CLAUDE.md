@@ -16,8 +16,21 @@ node scripts/knltb-fetch-ratings.js "<mijnknltb head-2-head URL>" --open
 
 # Browser extension (public delivery, per-user login):
 npm run sync:ext                  # copy scenarios.js + calculator into extension/ (run before load/package)
-node scripts/verify-extension.js  # end-to-end test: load ext + logged-in session, drive a real h2h page
+node scripts/verify-extension.js  # end-to-end test (Chromium): load ext + logged-in session, drive a real h2h page
+npm run ext:run:android           # load ext temporarily on Firefox Android over adb (web-ext)
+npm run ext:build                 # zip the extension into dist/ (for AMO upload)
+WEB_EXT_API_KEY=.. WEB_EXT_API_SECRET=.. npm run ext:sign   # Mozilla-signed .xpi in dist/ (install on any Android Firefox)
 ```
+
+**Android note:** the extension runs on **Firefox for Android** (same code; the manifest's
+`background.scripts` + `gecko.id` already cover it). The mijnknltb markup is identical under
+a mobile UA, so the scrapers need no changes. For local emulator testing on Apple Silicon,
+use the **arm64** AVD, sideload an official Firefox APK from
+`archive.mozilla.org/pub/fenix/releases/<ver>/android/...arm64-v8a.apk`, and (on a
+`google_apis` non-Play image) enable remote debugging headlessly via `adb root` +
+setting `pref_key_remote_debugging=true` (and `pref_key_terms_accepted=true` to skip
+onboarding) in `/data/data/org.mozilla.firefox/shared_prefs/fenix_preferences.xml`. iOS is
+unsupported (needs a Safari native-app wrapper).
 
 No build step required.
 

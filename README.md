@@ -23,10 +23,28 @@ staat niet op KNLTB), en opent de rekentool met alles ingevuld.
 2. Open `chrome://extensions`, zet **Ontwikkelaarsmodus** aan.
 3. **Niet-ingepakte extensie laden** → kies de map `extension/`.
 
-### Installeren (Firefox)
+### Installeren (Firefox desktop)
 
 1. `npm run sync:ext`
 2. Open `about:debugging#/runtime/this-firefox` → **Tijdelijke extensie laden** → kies `extension/manifest.json`.
+
+### Installeren (Android — Firefox)
+
+Werkt op **Firefox voor Android** (Chrome op Android ondersteunt geen extensies; iOS
+wordt niet ondersteund — dat vereist een Safari-app via de App Store).
+
+**Tijdelijk testen via USB / emulator** (laptop nodig):
+1. Zorg dat `adb` (Android Platform Tools) in je PATH staat en Firefox op het toestel/de
+   emulator draait met **Instellingen → Remote debugging via USB** aan.
+2. `npm run ext:run:android` — laadt de extensie tijdelijk.
+
+**Permanent installeren op al je toestellen** (Mozilla-ondertekende XPI):
+1. Maak een gratis [addons.mozilla.org](https://addons.mozilla.org) account en API-sleutels.
+2. `WEB_EXT_API_KEY=... WEB_EXT_API_SECRET=... npm run ext:sign` → levert een
+   **ondertekende** `.xpi` in `dist/` (niet-ondertekende XPI's kunnen niet op Firefox
+   Android geïnstalleerd worden).
+3. Zet de `.xpi` online (bijv. als GitHub release-asset) en open de link in Firefox op de
+   telefoon om te installeren. (Of publiceer de extensie listed op AMO.)
 
 ### Gebruiken
 
