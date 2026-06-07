@@ -16,13 +16,20 @@
       "128": "icons/icon128.png"
     }
   },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "knltb-rekentool@ruudvanderweijde.github.io",
+      "strict_min_version": "121.0"
+    }
+  },
   "host_permissions": [
     "https://mijnknltb.toernooi.nl/*",
     "https://www.nlpadel.nl/*",
     "https://id.knltb.nl/*"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "scripts": ["scenarios.js", "shared.js", "background.js"]
   },
   "content_scripts": [
     {

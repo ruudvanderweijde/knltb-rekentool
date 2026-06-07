@@ -3,7 +3,13 @@
 // response, so the network work happens here (host_permissions grant access),
 // and the result is messaged back to the content script.
 
-importScripts('scenarios.js', 'shared.js');
+// Chrome runs this as a service worker (only background.js is loaded) so it must
+// pull in the deps. Firefox runs it as an event page via manifest
+// background.scripts (which already loaded scenarios.js + shared.js), where
+// importScripts doesn't exist — hence the guard.
+if (typeof importScripts === 'function') {
+  importScripts('scenarios.js', 'shared.js');
+}
 
 const NLPADEL_URL =
   'https://www.nlpadel.nl/alles-over-padel/speel-padel/speelsterkte-rating/speelsterkte-rekentool/';
