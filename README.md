@@ -40,8 +40,8 @@ Wat je nodig hebt:
   als die er nog niet is — niet-ondertekende extensies kunnen niet op Firefox Android).
 
 Installeren:
-1. Open in **Firefox op je telefoon** de link naar de ondertekende `.xpi`
-   (bijv. een GitHub release-asset of de AMO-listing van dit project).
+1. Open in **Firefox op je telefoon** de link naar de ondertekende `.xpi` van de
+   [**Releases-pagina**](https://github.com/ruudvanderweijde/knltb-rekentool/releases).
 2. Firefox vraagt om te bevestigen → tik **Toevoegen / Add**.
 3. Sta toegang toe tot `mijnknltb.toernooi.nl`, `nlpadel.nl` en `id.knltb.nl` als
    Firefox daarom vraagt (nodig om je ratings te lezen en de uitslagen te berekenen).
@@ -55,14 +55,22 @@ Extensies moeten door Mozilla **ondertekend** zijn voordat ze op Firefox Android
 installeren zijn. Maak eenmalig een gratis [addons.mozilla.org](https://addons.mozilla.org)
 account met API-sleutels en draai:
 
+**Automatisch via GitHub Actions (aanbevolen):** voeg de twee AMO-sleutels toe als repo-secrets
+(*Settings → Secrets and variables → Actions*): `WEB_EXT_API_KEY` en `WEB_EXT_API_SECRET`.
+Publiceer daarna een **release met een semver-tag** (bijv. `v1.0.0`); de workflow
+`.github/workflows/release-extension.yml` tekent de extensie (versie = de tag) en hangt de
+ondertekende `.xpi` automatisch aan de release. Bump de tag per release — AMO weigert een
+al-ondertekende versie opnieuw.
+
+**Handmatig/lokaal** levert hetzelfde op:
+
 ```bash
 WEB_EXT_API_KEY=... WEB_EXT_API_SECRET=... npm run ext:sign   # → ondertekende .xpi in dist/
 ```
 
-Zet die `.xpi` ergens online (GitHub release-asset, of publiceer listed op AMO) en deel de
-link. Wil je het eerst **lokaal testen** op een toestel/emulator (laptop nodig)? Zorg dat
-`adb` in je PATH staat en Firefox op het toestel draait met **Instellingen → Remote
-debugging via USB** aan, en draai `npm run ext:run:android` (laadt de extensie tijdelijk).
+Eerst **lokaal testen** op een toestel/emulator (laptop nodig)? Zorg dat `adb` in je PATH
+staat en Firefox op het toestel draait met **Instellingen → Remote debugging via USB** aan,
+en draai `npm run ext:run:android` (laadt de extensie tijdelijk).
 
 ### Gebruiken
 
