@@ -11,6 +11,23 @@ de 18 uitslag-scenario's op bij de officiële [nlpadel.nl rekentool][rekentool].
 
 [rekentool]: https://www.nlpadel.nl/alles-over-padel/speel-padel/speelsterkte-rating/speelsterkte-rekentool/
 
+## De webpagina (handmatig — geen login, geen installatie)
+
+De eenvoudigste manier: open de
+[**rekentool-pagina**](https://ruudvanderweijde.github.io/knltb-rekentool/), vul per speler
+de **padel-dubbel rating** in (lees die af op mijnknltb), kies ♂/♀, en klik **Bereken
+ratingwijziging**. Je krijgt de 18 uitslagen met de nieuwe ratings.
+
+Werkt op elk apparaat (telefoon/desktop), zonder login of installatie. De ratings typ je
+zelf in — een webpagina kan ze niet van je mijnknltb-account lezen (dat is wat de extensie
+doet, zie hieronder).
+
+> **Over de proxy.** De pagina kan de nlpadel-rekentool niet rechtstreeks aanroepen
+> (browsers blokkeren dat via CORS + een `SameSite=Strict`-cookie — niets met inloggen te
+> maken; nlpadel vereist geen login). Een piepkleine, **anonieme en stateless** proxy
+> (`proxy/`, een Cloudflare Worker) doet die call. Hij bewaart niets en kent geen accounts.
+> Zie [De proxy draaien](#de-proxy-draaien-beheerder).
+
 ## Voor gebruikers: de browser-extensie
 
 De extensie zet een knop op elke mijnknltb **head-2-head** pagina. Eén klik haalt
@@ -89,6 +106,19 @@ opgeslagen KNLTB-sessie in `scripts/.knltb-userdata/`):
 npm start                                            # lokale web-app op http://localhost:3000
 node scripts/knltb-fetch-ratings.js "<h2h URL>" --open   # CLI: ophalen + calculator openen
 ```
+
+## De proxy draaien (beheerder)
+
+De webpagina heeft de anonieme nlpadel-proxy nodig (`proxy/`, Cloudflare Worker).
+
+```bash
+npm run proxy:dev      # lokaal op http://localhost:8787  (wijzig DELTAS_API in app.js om te testen)
+npm run proxy:deploy   # → https://knltb-rekentool-proxy.<jouw-subdomein>.workers.dev
+```
+
+Na `proxy:deploy` (eenmalig een gratis Cloudflare-account + `wrangler login` nodig) krijg
+je de Worker-URL. Zet die als `DELTAS_API` boven in `app.js` (`<jouw-subdomein>` invullen)
+en commit — pas dan werkt de gehoste pagina. De proxy is anoniem en bewaart niets.
 
 ## Ontwikkelen & testen
 

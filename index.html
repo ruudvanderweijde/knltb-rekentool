@@ -20,16 +20,19 @@
   <main>
     <section class="card">
       <h2>Spelers</h2>
+      <p class="note">Vul de <em>padel-dubbel</em> rating per speler in (lees deze af op mijnknltb). Lager = beter.</p>
       <div class="teams">
         <div class="team">
           <h3>Team 1</h3>
           <div class="player-row">
-            <label class="player-label" for="r1">Speler 1</label>
-            <input type="text" id="r1" class="rating-input" placeholder="bijv. 5,1234">
+            <input type="text" id="n1" class="name-input" placeholder="Speler 1" aria-label="Naam speler 1">
+            <input type="text" id="r1" class="rating-input" placeholder="rating" aria-label="Rating speler 1" inputmode="decimal">
+            <select id="g1" class="gender-select" aria-label="Geslacht speler 1"><option value="m">♂</option><option value="v">♀</option></select>
           </div>
           <div class="player-row">
-            <label class="player-label" for="r2">Speler 2</label>
-            <input type="text" id="r2" class="rating-input" placeholder="bijv. 6,0000">
+            <input type="text" id="n2" class="name-input" placeholder="Speler 2" aria-label="Naam speler 2">
+            <input type="text" id="r2" class="rating-input" placeholder="rating" aria-label="Rating speler 2" inputmode="decimal">
+            <select id="g2" class="gender-select" aria-label="Geslacht speler 2"><option value="m">♂</option><option value="v">♀</option></select>
           </div>
           <div class="combined-row">Gecombineerd: <strong id="r12">—</strong></div>
         </div>
@@ -37,15 +40,21 @@
         <div class="team">
           <h3>Team 2</h3>
           <div class="player-row">
-            <label class="player-label" for="r3">Speler 3</label>
-            <input type="text" id="r3" class="rating-input" placeholder="bijv. 5,8000">
+            <input type="text" id="n3" class="name-input" placeholder="Speler 3" aria-label="Naam speler 3">
+            <input type="text" id="r3" class="rating-input" placeholder="rating" aria-label="Rating speler 3" inputmode="decimal">
+            <select id="g3" class="gender-select" aria-label="Geslacht speler 3"><option value="m">♂</option><option value="v">♀</option></select>
           </div>
           <div class="player-row">
-            <label class="player-label" for="r4">Speler 4</label>
-            <input type="text" id="r4" class="rating-input" placeholder="bijv. 4,8000">
+            <input type="text" id="n4" class="name-input" placeholder="Speler 4" aria-label="Naam speler 4">
+            <input type="text" id="r4" class="rating-input" placeholder="rating" aria-label="Rating speler 4" inputmode="decimal">
+            <select id="g4" class="gender-select" aria-label="Geslacht speler 4"><option value="m">♂</option><option value="v">♀</option></select>
           </div>
           <div class="combined-row">Gecombineerd: <strong id="r34">—</strong></div>
         </div>
+      </div>
+      <div class="actions">
+        <button id="calcBtn" type="button" class="calc-btn">Bereken ratingwijziging</button>
+        <span id="calcStatus" class="calc-status"></span>
       </div>
     </section>
 
@@ -91,7 +100,7 @@
 
     <section class="card" id="noResultsHint" hidden>
       <h2>Ratingwijziging per uitslag</h2>
-      <p class="note">Open de calculator via <code>node scripts/knltb-fetch-ratings.js "&lt;head-2-head URL&gt;" --open</code> om de wijzigingen per uitslag te zien. De berekening komt van de nlpadel.nl rekentool.</p>
+      <p class="note">Klik op <strong>Bereken ratingwijziging</strong> om de 18 uitslagen op te halen via de nlpadel.nl rekentool.</p>
     </section>
   </main>
 

@@ -1,0 +1,7 @@
+name = "knltb-rekentool-proxy"
+main = "worker.js"
+compatibility_date = "2026-06-01"
+
+# Deploy: cd proxy && npx wrangler deploy
+# Local:  cd proxy && npx wrangler dev   (serves on http://localhost:8787)
+# The Worker is anonymous and stateless — no secrets/vars needed.

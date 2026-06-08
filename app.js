@@ -1,14 +1,22 @@
-const PLAYER_NAMES = ['Speler 1', 'Speler 2', 'Speler 3', 'Speler 4'];
-const DEFAULT_PLAYER_NAMES = [...PLAYER_NAMES];
+const DEFAULT_PLAYER_NAMES = ['Speler 1', 'Speler 2', 'Speler 3', 'Speler 4'];
+const PLAYER_NAMES = [...DEFAULT_PLAYER_NAMES];
+
+// Anonymous, stateless proxy that fetches the nlpadel deltas (needed only to get
+// around the browser's CORS + SameSite rules; no login/secrets). Override for
+// local testing, e.g. http://localhost:8787/deltas
+const DELTAS_API = 'https://knltb-rekentool-proxy.workers.dev/deltas';
 
 let prefetchedWinDeltas  = null; // array of 9 numbers or null
 let prefetchedLossDeltas = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-  ['r1', 'r2', 'r3', 'r4'].forEach(id => {
-    document.getElementById(id).addEventListener('input', recalculate);
+  ['r1', 'r2', 'r3', 'r4', 'n1', 'n2', 'n3', 'n4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', recalculate);
   });
   applyUrlPrefill();
+  const btn = document.getElementById('calcBtn');
+  if (btn) btn.addEventListener('click', fetchDeltas);
   recalculate();
 });
 
@@ -20,41 +28,43 @@ function applyUrlPrefill() {
   );
   ['R1', 'R2', 'R3', 'R4'].forEach((key, i) => {
     const v = params.get(key);
-    if (v == null) return;
-    document.getElementById(`r${i + 1}`).value = v;
+    if (v != null) setVal(`r${i + 1}`, v);
   });
-  applyPlayerNames(params.get('n'), params.get('g'));
+  const names = (params.get('n') || '').split(',').map(s => decodeURIComponent(s).trim());
+  const genders = (params.get('g') || '').split(',').map(s => s.trim().toLowerCase());
+  for (let i = 0; i < 4; i++) {
+    if (names[i]) setVal(`n${i + 1}`, names[i]);
+    const sym = genderSymbol(genders[i]);
+    if (sym) setVal(`g${i + 1}`, sym === '♀' ? 'v' : 'm');
+  }
   prefetchedWinDeltas  = parseDeltaList(params.get('w'));
   prefetchedLossDeltas = parseDeltaList(params.get('l'));
 }
 
-// `n` is a comma-separated list of up to 4 URL-encoded player names; `g` is a
-// comma-separated list of genders (m/v or male/female). Blank/missing names
-// fall back to the default "Speler N" label; unknown genders show no symbol.
-function applyPlayerNames(rawNames, rawGenders) {
-  const names = (rawNames || '').split(',').map(s => decodeURIComponent(s).trim());
-  const genders = (rawGenders || '').split(',').map(s => s.trim().toLowerCase());
-  if (!rawNames && !rawGenders) return;
-  for (let i = 0; i < 4; i++) {
-    PLAYER_NAMES[i] = names[i] || DEFAULT_PLAYER_NAMES[i];
-    const label = document.querySelector(`label[for="r${i + 1}"]`);
-    if (!label) continue;
-    const symbol = genderSymbol(genders[i]);
-    label.textContent = PLAYER_NAMES[i];
-    if (symbol) {
-      const span = document.createElement('span');
-      span.className = `gender gender-${symbol === '♀' ? 'f' : 'm'}`;
-      span.textContent = ` ${symbol}`;
-      label.appendChild(span);
-    }
-  }
-}
+function setVal(id, v) { const el = document.getElementById(id); if (el) el.value = v; }
 
 function genderSymbol(g) {
   if (!g) return '';
   if (g.startsWith('v') || g.startsWith('f') || g.startsWith('w')) return '♀';
   if (g.startsWith('m')) return '♂';
   return '';
+}
+
+// Pull the (optional) names from the inputs into PLAYER_NAMES, falling back to
+// the default "Speler N" when empty.
+function readPlayerNames() {
+  for (let i = 0; i < 4; i++) {
+    const el = document.getElementById(`n${i + 1}`);
+    const v = el && el.value.trim();
+    PLAYER_NAMES[i] = v || DEFAULT_PLAYER_NAMES[i];
+  }
+}
+
+function readGenders() {
+  return [1, 2, 3, 4].map(i => {
+    const el = document.getElementById(`g${i}`);
+    return el && el.value === 'v' ? 'female' : 'male';
+  });
 }
 
 function parseDeltaList(s) {
@@ -66,6 +76,7 @@ function parseDeltaList(s) {
 }
 
 function recalculate() {
+  readPlayerNames();
   const R1 = parseRating('r1');
   const R2 = parseRating('r2');
   const R3 = parseRating('r3');
@@ -86,6 +97,47 @@ function recalculate() {
   const result = calcPadel(R1, R2, R3, R4);
   renderProbability(result);
   if (hasPrefetch) renderMatrix(R1, R2, R3, R4);
+}
+
+// Fetch the 18 deltas from the proxy for the current ratings + genders, then
+// render. Editing the ratings invalidates a previous result, so we always
+// recompute from the inputs on click.
+async function fetchDeltas() {
+  const ratings = ['r1', 'r2', 'r3', 'r4'].map(parseRating);
+  if (!ratings.every(r => !isNaN(r) && r >= 1 && r <= 12)) {
+    setStatus('Vul eerst 4 geldige ratings in (1–12).', true);
+    return;
+  }
+  const btn = document.getElementById('calcBtn');
+  btn.disabled = true;
+  setStatus('Bezig met berekenen via nlpadel…');
+  try {
+    const resp = await fetch(DELTAS_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ratings, genders: readGenders() }),
+    });
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(data.error || `HTTP ${resp.status}`);
+    const w = parseDeltaList((data.winDeltas || []).join(','));
+    const l = parseDeltaList((data.lossDeltas || []).join(','));
+    if (!w || !l) throw new Error('Onverwacht antwoord van de rekentool.');
+    prefetchedWinDeltas = w;
+    prefetchedLossDeltas = l;
+    setStatus('');
+    recalculate();
+  } catch (err) {
+    setStatus(`Mislukt: ${err.message}`, true);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function setStatus(text, isError) {
+  const el = document.getElementById('calcStatus');
+  if (!el) return;
+  el.textContent = text;
+  el.className = 'calc-status' + (isError ? ' error' : '');
 }
 
 function renderProbability(result) {
@@ -131,8 +183,8 @@ function renderGroup(theadId, tbodyId, scenarios, deltas, R1, R2, R3, R4) {
   }).join('');
 }
 
-// Names come from the URL (?n=) and are interpolated into innerHTML in
-// renderGroup, so they must be escaped to prevent XSS via crafted links.
+// Names come from user input / the URL (?n=) and are interpolated into innerHTML
+// in renderGroup, so they must be escaped to prevent XSS via crafted links.
 function escapeHtml(s) {
   return String(s == null ? '' : s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')

@@ -22,5 +22,9 @@ examples/
 dist/
 web-ext-artifacts/
 
+# wrangler (Cloudflare Worker proxy) local state
+.wrangler/
+proxy/.wrangler/
+
 # Code-review report (local working doc)
 REVIEW.md

@@ -8,6 +8,8 @@
     "ext:run:android": "npm run sync:ext && web-ext run -t firefox-android --source-dir extension",
     "ext:build": "npm run sync:ext && web-ext build --source-dir extension --overwrite-dest --artifacts-dir dist",
     "ext:sign": "npm run sync:ext && web-ext sign --source-dir extension --channel=unlisted --artifacts-dir dist",
+    "proxy:dev": "npx wrangler dev --config proxy/wrangler.toml",
+    "proxy:deploy": "npx wrangler deploy --config proxy/wrangler.toml",
     "test": "node --test 'tests/**/*.test.js'"
   },
   "engines": {
