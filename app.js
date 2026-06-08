@@ -103,7 +103,7 @@ function renderMatrix(R1, R2, R3, R4) {
 }
 
 function renderGroup(theadId, tbodyId, scenarios, deltas, R1, R2, R3, R4) {
-  const [n1, n2, n3, n4] = PLAYER_NAMES;
+  const [n1, n2, n3, n4] = PLAYER_NAMES.map(escapeHtml);
   document.getElementById(theadId).innerHTML = `
     <tr>
       <th>Uitslag</th>
@@ -129,6 +129,14 @@ function renderGroup(theadId, tbodyId, scenarios, deltas, R1, R2, R3, R4) {
       <td class="rating-new">${fmt(R4 + d2)}</td>
     </tr>`;
   }).join('');
+}
+
+// Names come from the URL (?n=) and are interpolated into innerHTML in
+// renderGroup, so they must be escaped to prevent XSS via crafted links.
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 function parseRating(id) {

@@ -101,7 +101,14 @@ function parseNlpadelResponse(html) {
   if (strongs.length < 8) {
     throw new Error(`nlpadel-respons had ${strongs.length} getallen, verwacht 8`);
   }
-  return { deltaTeam1: strongs[3], deltaTeam2: strongs[7] };
+  const deltaTeam1 = strongs[3];
+  const deltaTeam2 = strongs[7];
+  // Deltas are strictly zero-sum; if not, we parsed the wrong page (SSO/redirect
+  // 200) or nlpadel's layout changed — fail rather than show a wrong rating change.
+  if (Math.abs(deltaTeam1 + deltaTeam2) > 0.001) {
+    throw new Error(`nlpadel-respons niet zero-sum (Δ1=${deltaTeam1}, Δ2=${deltaTeam2}) — verkeerde pagina geparset?`);
+  }
+  return { deltaTeam1, deltaTeam2 };
 }
 
 // ── calculator query string ──────────────────────────────────────────────────
