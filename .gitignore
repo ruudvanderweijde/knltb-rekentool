@@ -21,3 +21,6 @@ examples/
 # web-ext build/sign artifacts
 dist/
 web-ext-artifacts/
+
+# Code-review report (local working doc)
+REVIEW.md
