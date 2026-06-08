@@ -28,23 +28,41 @@ staat niet op KNLTB), en opent de rekentool met alles ingevuld.
 1. `npm run sync:ext`
 2. Open `about:debugging#/runtime/this-firefox` → **Tijdelijke extensie laden** → kies `extension/manifest.json`.
 
-### Installeren (Android — Firefox)
+### Installeren op je telefoon (Android)
 
-Werkt op **Firefox voor Android** (Chrome op Android ondersteunt geen extensies; iOS
-wordt niet ondersteund — dat vereist een Safari-app via de App Store).
+> **Alleen Android + Firefox.** Chrome op Android ondersteunt geen extensies, en
+> **iPhone/iOS wordt niet ondersteund** (dat zou een aparte Safari-app via de App Store
+> vereisen). Op de telefoon gebruik je dus de app **Firefox** (uit de Play Store).
 
-**Tijdelijk testen via USB / emulator** (laptop nodig):
-1. Zorg dat `adb` (Android Platform Tools) in je PATH staat en Firefox op het toestel/de
-   emulator draait met **Instellingen → Remote debugging via USB** aan.
-2. `npm run ext:run:android` — laadt de extensie tijdelijk.
+Wat je nodig hebt:
+- Een Android-telefoon met **[Firefox](https://play.google.com/store/apps/details?id=org.mozilla.firefox)** geïnstalleerd.
+- Een **ondertekende `.xpi`** van de extensie (zie *Een ondertekende build maken* hieronder
+  als die er nog niet is — niet-ondertekende extensies kunnen niet op Firefox Android).
 
-**Permanent installeren op al je toestellen** (Mozilla-ondertekende XPI):
-1. Maak een gratis [addons.mozilla.org](https://addons.mozilla.org) account en API-sleutels.
-2. `WEB_EXT_API_KEY=... WEB_EXT_API_SECRET=... npm run ext:sign` → levert een
-   **ondertekende** `.xpi` in `dist/` (niet-ondertekende XPI's kunnen niet op Firefox
-   Android geïnstalleerd worden).
-3. Zet de `.xpi` online (bijv. als GitHub release-asset) en open de link in Firefox op de
-   telefoon om te installeren. (Of publiceer de extensie listed op AMO.)
+Installeren:
+1. Open in **Firefox op je telefoon** de link naar de ondertekende `.xpi`
+   (bijv. een GitHub release-asset of de AMO-listing van dit project).
+2. Firefox vraagt om te bevestigen → tik **Toevoegen / Add**.
+3. Sta toegang toe tot `mijnknltb.toernooi.nl`, `nlpadel.nl` en `id.knltb.nl` als
+   Firefox daarom vraagt (nodig om je ratings te lezen en de uitslagen te berekenen).
+
+Daarna werkt het net als op desktop (zie [Gebruiken](#gebruiken)): log in op mijnknltb in
+Firefox, open een head-2-head pagina en tik op de knop **🎾 Bereken rating-scenario's**.
+
+#### Een ondertekende build maken (voor de beheerder)
+
+Extensies moeten door Mozilla **ondertekend** zijn voordat ze op Firefox Android te
+installeren zijn. Maak eenmalig een gratis [addons.mozilla.org](https://addons.mozilla.org)
+account met API-sleutels en draai:
+
+```bash
+WEB_EXT_API_KEY=... WEB_EXT_API_SECRET=... npm run ext:sign   # → ondertekende .xpi in dist/
+```
+
+Zet die `.xpi` ergens online (GitHub release-asset, of publiceer listed op AMO) en deel de
+link. Wil je het eerst **lokaal testen** op een toestel/emulator (laptop nodig)? Zorg dat
+`adb` in je PATH staat en Firefox op het toestel draait met **Instellingen → Remote
+debugging via USB** aan, en draai `npm run ext:run:android` (laadt de extensie tijdelijk).
 
 ### Gebruiken
 
