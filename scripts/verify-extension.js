@@ -1,18 +1,29 @@
 'use strict';
 
 // End-to-end check of the browser extension: loads it + the existing logged-in
-// KNLTB session, drives the real h2h page, and asserts the opened calculator
-// URL carries the known-good deltas. Usage: node scripts/verify-extension.js
+// KNLTB session, drives a real h2h page, and (optionally) asserts the opened
+// calculator URL carries known-good deltas.
+//
+// No personal data is hardcoded — supply a real head-2-head URL (and optional
+// expected values for regression) via env vars:
+//   KNLTB_H2H_URL='https://mijnknltb.toernooi.nl/head-2-head?...' \
+//   KNLTB_EXPECT_G=f,f,m,m KNLTB_EXPECT_W='-0.34,...' KNLTB_EXPECT_L='0.15,...' \
+//   node scripts/verify-extension.js
+// Keep your real fixtures out of git (e.g. a local, gitignored env file).
 
 const path = require('path');
 const { chromium } = require('playwright');
 
 const EXT = path.resolve(__dirname, '..', 'extension');
 const USER_DATA_DIR = path.join(__dirname, '.knltb-userdata');
-const H2H = 'https://mijnknltb.toernooi.nl/head-2-head?OrganizationCode=ORGCODE&T1P1MemberID=PLAYER1&T1P2MemberID=PLAYER2&T2P1MemberID=PLAYER3&T2P2MemberID=PLAYER4';
-
-const EXPECT_W = '-0.3408,-0.2782,-0.2366,-0.1949,-0.1741,-0.1532,-0.1324,-0.1532,-0.1116';
-const EXPECT_L = '0.1592,0.0968,0.0551,0.0134,0,0,0,0,0';
+const H2H = process.env.KNLTB_H2H_URL;
+if (!H2H) {
+  console.error('Set KNLTB_H2H_URL to a mijnknltb head-2-head URL to run this check.');
+  process.exit(2);
+}
+const EXPECT_G = process.env.KNLTB_EXPECT_G || null; // e.g. "f,f,m,m"
+const EXPECT_W = process.env.KNLTB_EXPECT_W || null;
+const EXPECT_L = process.env.KNLTB_EXPECT_L || null;
 
 (async () => {
   const ctx = await chromium.launchPersistentContext(USER_DATA_DIR, {
@@ -57,7 +68,9 @@ const EXPECT_L = '0.1592,0.0968,0.0551,0.0134,0,0,0,0,0';
     console.log('  w =', w);
     console.log('  l =', l);
 
-    const okW = w === EXPECT_W, okL = l === EXPECT_L, okG = g === 'f,f,m,m';
+    // Each assertion is skipped (treated as pass) when no expected value is set.
+    const check = (actual, expected) => expected == null ? 'skip' : (actual === expected ? 'OK' : 'FAIL');
+    const rW = check(w, EXPECT_W), rL = check(l, EXPECT_L), rG = check(g, EXPECT_G);
 
     // Render check is best-effort: when CALC_URL points at GitHub Pages it only
     // renders once Pages is deployed. The pipeline assertion (g/w/l) is the gate.
@@ -71,9 +84,9 @@ const EXPECT_L = '0.1592,0.0968,0.0551,0.0134,0,0,0,0,0';
       console.log(`  rendered label r1="${label1}"`);
     }
 
-    const pipelineOk = okG && okW && okL;
-    console.log(`\nRESULT: g ${okG ? 'OK' : 'FAIL'} | w ${okW ? 'OK' : 'FAIL'} | l ${okL ? 'OK' : 'FAIL'} | render ${renderNote}`);
-    if (!pipelineOk || (!isRemote && rowsVisible !== 9)) process.exitCode = 1;
+    const pipelineFailed = [rW, rL, rG].includes('FAIL');
+    console.log(`\nRESULT: g ${rG} | w ${rW} | l ${rL} | render ${renderNote}`);
+    if (pipelineFailed || (!isRemote && rowsVisible !== 9)) process.exitCode = 1;
   } finally {
     await ctx.close();
   }
