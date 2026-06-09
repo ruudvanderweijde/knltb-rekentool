@@ -1,13 +1,9 @@
 {
   "name": "knltb-rekentool",
   "version": "1.0.0",
-  "description": "KNLTB Padel Rekentool – browser extensie",
+  "description": "KNLTB Padel Rekentool – webpagina + CLI voor DSS padel-ratingwijzigingen",
   "scripts": {
     "start": "node server.js",
-    "sync:ext": "node scripts/sync-extension.js",
-    "ext:run:android": "npm run sync:ext && web-ext run -t firefox-android --source-dir extension",
-    "ext:build": "npm run sync:ext && web-ext build --source-dir extension --overwrite-dest --artifacts-dir dist",
-    "ext:sign": "npm run sync:ext && web-ext sign --source-dir extension --channel=unlisted --artifacts-dir dist",
     "proxy:dev": "npx wrangler dev --config proxy/wrangler.toml",
     "proxy:deploy": "npx wrangler deploy --config proxy/wrangler.toml",
     "test": "node --test 'tests/**/*.test.js'"
@@ -16,7 +12,6 @@
     "node": ">=18"
   },
   "devDependencies": {
-    "playwright": "^1.59.1",
-    "web-ext": "^10.3.0"
+    "playwright": "^1.59.1"
   }
 }

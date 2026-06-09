@@ -1,26 +1,24 @@
 # KNLTB Padel Rekentool
 
-Bereken de DSS-ratingwijziging per uitslag voor een padel-dubbelpartij. Lees de
-vier *padel-dubbel* ratings + namen van een mijnknltb head-2-head pagina en haal
-de 18 uitslag-scenario's op bij de officiële [nlpadel.nl rekentool][rekentool].
+Bereken de DSS-ratingwijziging per uitslag voor een padel-dubbelpartij: vul de vier
+*padel-dubbel* ratings in en zie wat elke score met je rating doet. De 18 uitslag-scenario's
+komen van de officiële [nlpadel.nl rekentool][rekentool].
 
-> **Onofficieel.** Niet gelieerd aan of goedgekeurd door de KNLTB of nlpadel.
-> De browser-extensie draait volledig in je eigen browser met **jouw eigen
-> KNLTB-login** — er worden geen wachtwoorden of gegevens verzameld of naar een
-> server gestuurd. Gebruik op eigen risico en respecteer de voorwaarden van de KNLTB.
+> **Onofficieel.** Niet gelieerd aan of goedgekeurd door de KNLTB of nlpadel. Gebruik op
+> eigen risico en respecteer de voorwaarden van de KNLTB. Er worden geen accounts of
+> persoonsgegevens opgeslagen.
 
 [rekentool]: https://www.nlpadel.nl/alles-over-padel/speel-padel/speelsterkte-rating/speelsterkte-rekentool/
 
-## De webpagina (handmatig — geen login, geen installatie)
+## De webpagina (geen login, geen installatie)
 
-De eenvoudigste manier: open de
-[**rekentool-pagina**](https://ruudvanderweijde.github.io/knltb-rekentool/), vul per speler
-de **padel-dubbel rating** in (lees die af op mijnknltb), kies ♂/♀, en klik **Bereken
-ratingwijziging**. Je krijgt de 18 uitslagen met de nieuwe ratings.
+Open de [**rekentool-pagina**](https://ruudvanderweijde.github.io/knltb-rekentool/), vul per
+speler de **padel-dubbel rating** in (lees die af op mijnknltb), kies ♂/♀, en klik **Bereken
+ratingwijziging**. Je krijgt de 18 uitslagen met de nieuwe ratings. Werkt op elk apparaat
+(telefoon/desktop).
 
-Werkt op elk apparaat (telefoon/desktop), zonder login of installatie. De ratings typ je
-zelf in — een webpagina kan ze niet van je mijnknltb-account lezen (dat is wat de extensie
-doet, zie hieronder).
+De ratings typ je zelf in — een gewone webpagina kan ze niet van je mijnknltb-account lezen
+(daarvoor is een login nodig; zie de CLI hieronder).
 
 > **Over de proxy.** De pagina kan de nlpadel-rekentool niet rechtstreeks aanroepen
 > (browsers blokkeren dat via CORS + een `SameSite=Strict`-cookie — niets met inloggen te
@@ -28,82 +26,14 @@ doet, zie hieronder).
 > (`proxy/`, een Cloudflare Worker) doet die call. Hij bewaart niets en kent geen accounts.
 > Zie [De proxy draaien](#de-proxy-draaien-beheerder).
 
-## Voor gebruikers: de browser-extensie
+## Voor de beheerder: auto-ophalen via CLI & lokale web-app
 
-De extensie zet een knop op elke mijnknltb **head-2-head** pagina. Eén klik haalt
-de ratings + namen op (met jouw login), vraagt om het geslacht te bevestigen (dat
-staat niet op KNLTB), en opent de rekentool met alles ingevuld.
-
-### Installeren (Chrome / Edge)
-
-1. `npm run sync:ext` (kopieert de rekentool-bestanden in de extensie — eenmalig of na een update).
-2. Open `chrome://extensions`, zet **Ontwikkelaarsmodus** aan.
-3. **Niet-ingepakte extensie laden** → kies de map `extension/`.
-
-### Installeren (Firefox desktop)
-
-1. `npm run sync:ext`
-2. Open `about:debugging#/runtime/this-firefox` → **Tijdelijke extensie laden** → kies `extension/manifest.json`.
-
-### Installeren op je telefoon (Android)
-
-> **Alleen Android + Firefox.** Chrome op Android ondersteunt geen extensies, en
-> **iPhone/iOS wordt niet ondersteund** (dat zou een aparte Safari-app via de App Store
-> vereisen). Op de telefoon gebruik je dus de app **Firefox** (uit de Play Store).
-
-Wat je nodig hebt:
-- Een Android-telefoon met **[Firefox](https://play.google.com/store/apps/details?id=org.mozilla.firefox)** geïnstalleerd.
-- Een **ondertekende `.xpi`** van de extensie (zie *Een ondertekende build maken* hieronder
-  als die er nog niet is — niet-ondertekende extensies kunnen niet op Firefox Android).
-
-Installeren:
-1. Open in **Firefox op je telefoon** de link naar de ondertekende `.xpi` van de
-   [**Releases-pagina**](https://github.com/ruudvanderweijde/knltb-rekentool/releases).
-2. Firefox vraagt om te bevestigen → tik **Toevoegen / Add**.
-3. Sta toegang toe tot `mijnknltb.toernooi.nl`, `nlpadel.nl` en `id.knltb.nl` als
-   Firefox daarom vraagt (nodig om je ratings te lezen en de uitslagen te berekenen).
-
-Daarna werkt het net als op desktop (zie [Gebruiken](#gebruiken)): log in op mijnknltb in
-Firefox, open een head-2-head pagina en tik op de knop **🎾 Bereken rating-scenario's**.
-
-#### Een ondertekende build maken (voor de beheerder)
-
-Extensies moeten door Mozilla **ondertekend** zijn voordat ze op Firefox Android te
-installeren zijn. Maak eenmalig een gratis [addons.mozilla.org](https://addons.mozilla.org)
-account met API-sleutels en draai:
-
-**Automatisch via GitHub Actions (aanbevolen):** voeg de twee AMO-sleutels toe als repo-secrets
-(*Settings → Secrets and variables → Actions*): `WEB_EXT_API_KEY` en `WEB_EXT_API_SECRET`.
-Publiceer daarna een **release met een semver-tag** (bijv. `v1.0.0`); de workflow
-`.github/workflows/release-extension.yml` tekent de extensie (versie = de tag) en hangt de
-ondertekende `.xpi` automatisch aan de release. Bump de tag per release — AMO weigert een
-al-ondertekende versie opnieuw.
-
-**Handmatig/lokaal** levert hetzelfde op:
+Wie de ratings + namen automatisch uit een mijnknltb **head-2-head** URL wil halen (met je
+eigen KNLTB-login) gebruikt de lokale tools. Vereisen Playwright + een opgeslagen
+KNLTB-sessie in `scripts/.knltb-userdata/`:
 
 ```bash
-WEB_EXT_API_KEY=... WEB_EXT_API_SECRET=... npm run ext:sign   # → ondertekende .xpi in dist/
-```
-
-Eerst **lokaal testen** op een toestel/emulator (laptop nodig)? Zorg dat `adb` in je PATH
-staat en Firefox op het toestel draait met **Instellingen → Remote debugging via USB** aan,
-en draai `npm run ext:run:android` (laadt de extensie tijdelijk).
-
-### Gebruiken
-
-1. Log in op [mijnknltb.toernooi.nl](https://mijnknltb.toernooi.nl).
-2. Open een **head-2-head** vergelijking van 4 spelers (een dubbelpartij).
-3. Klik op **🎾 Bereken rating-scenario's** (rechtsonder).
-4. Controleer het geslacht per speler en klik **Bereken →**. Er opent een tabblad
-   met de ratingwijziging per uitslag.
-
-## Voor de beheerder: CLI & lokale web-app
-
-Naast de extensie zijn er twee lokale hulpmiddelen (vereisen Playwright + een
-opgeslagen KNLTB-sessie in `scripts/.knltb-userdata/`):
-
-```bash
-npm start                                            # lokale web-app op http://localhost:3000
+npm start                                                # lokale web-app op http://localhost:3000
 node scripts/knltb-fetch-ratings.js "<h2h URL>" --open   # CLI: ophalen + calculator openen
 ```
 
@@ -116,33 +46,31 @@ npm run proxy:dev      # lokaal op http://localhost:8787  (wijzig DELTAS_API in 
 npm run proxy:deploy   # → https://knltb-rekentool-proxy.<jouw-subdomein>.workers.dev
 ```
 
-Na `proxy:deploy` (eenmalig een gratis Cloudflare-account + `wrangler login` nodig) krijg
-je de Worker-URL. Zet die als `DELTAS_API` boven in `app.js` (`<jouw-subdomein>` invullen)
-en commit — pas dan werkt de gehoste pagina. De proxy is anoniem en bewaart niets.
+Na `proxy:deploy` (eenmalig een gratis Cloudflare-account + `wrangler login` nodig) krijg je
+de Worker-URL. Zet die als `DELTAS_API` boven in `app.js` en commit — pas dan werkt de
+gehoste pagina. De proxy is anoniem en bewaart niets.
 
 ## Ontwikkelen & testen
 
-Vereist **Node.js ≥ 18**. Eenmalig `npm install` voor Playwright (alleen voor CLI/server/verificatie).
+Vereist **Node.js ≥ 18**. Eenmalig `npm install` voor Playwright (alleen voor de CLI/server).
 
 ```bash
-npm test                              # unit tests (DSS-config, ratings, winstverwachting)
-npm run sync:ext                      # extensie-bestanden synchroniseren
-node scripts/verify-extension.js      # end-to-end test van de extensie (vereist login + display)
+npm test       # unit tests (DSS-config, gecombineerde ratings, winstverwachting)
 ```
 
 ## Structuur
 
 ```
-index.html, app.js, style.css        ← de calculator (statische pagina, query-gestuurd)
+index.html, app.js, style.css          ← de webpagina (statisch, query-gestuurd + handmatige invoer)
 config.js, calculator.js, scenarios.js ← DSS-constanten, win-kans, de 18 scenario's
-extension/                            ← browser-extensie (MV3)
-  manifest.json, content.js, background.js, shared.js, modal.css
-  scenarios.js, calculator/           ← gegenereerd door `npm run sync:ext`
+proxy/
+  nlpadel-core.mjs                      ← nlpadel-client (fetch + cookie-jar, geen Playwright)
+  worker.js, wrangler.toml              ← Cloudflare Worker (POST /deltas) + config
 scripts/
-  fetch-core.js                       ← gedeelde Node-fetch-logica (CLI + server)
-  knltb-fetch-ratings.js              ← CLI
-  sync-extension.js, verify-extension.js
-server.js                             ← lokale web-app
+  fetch-core.js                         ← gedeelde Node-fetch-logica (CLI + server, Playwright)
+  knltb-fetch-ratings.js                ← CLI (auto-ophalen met je KNLTB-login)
+  diagnose-session.js                   ← KNLTB-sessie diagnose
+server.js                               ← lokale web-app (auto-ophalen)
 tests/calculator.test.js
 ```
 
@@ -152,7 +80,5 @@ tests/calculator.test.js
 - De calculator rekent zelf **geen** delta's uit — die komen van nlpadel (de formule is
   niet openbaar). De pagina toont gecombineerde ratings + winstverwachting lokaal.
 - **Geslacht beïnvloedt de delta** zodra de twee teams qua geslacht verschillen
-  (♀♀ vs ♂♂ ≠ ♂♂ vs ♂♂). Het staat niet op KNLTB, dus het wordt gegokt op voornaam
-  en bevestigd door de gebruiker.
+  (♀♀ vs ♂♂ ≠ ♂♂ vs ♂♂).
 - De nlpadel-rekentool vereist **geen** login; alleen het lezen van de KNLTB-ratings wel.
-```

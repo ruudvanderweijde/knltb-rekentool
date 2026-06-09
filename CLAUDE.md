@@ -14,29 +14,13 @@ open index.html                   # open directly in browser (file://)
 # CLI: pull 4 KNLTB padel ratings + 18 nlpadel deltas, then open the calculator:
 node scripts/knltb-fetch-ratings.js "<mijnknltb head-2-head URL>" --open
 
-# Browser extension (public delivery, per-user login):
-npm run sync:ext                  # copy scenarios.js + calculator into extension/ (run before load/package)
-node scripts/verify-extension.js  # end-to-end test (Chromium): load ext + logged-in session, drive a real h2h page
-npm run ext:run:android           # load ext temporarily on Firefox Android over adb (web-ext)
-npm run ext:build                 # zip the extension into dist/ (for AMO upload)
-WEB_EXT_API_KEY=.. WEB_EXT_API_SECRET=.. npm run ext:sign   # Mozilla-signed .xpi in dist/ (install on any Android Firefox)
-
 # Public manual-entry page proxy (Cloudflare Worker in proxy/):
 npm run proxy:dev                 # local worker at http://localhost:8787
 npm run proxy:deploy              # deploy → set the URL as DELTAS_API in app.js
 ```
 
-**Android note:** the extension runs on **Firefox for Android** (same code; the manifest's
-`background.scripts` + `gecko.id` already cover it). The mijnknltb markup is identical under
-a mobile UA, so the scrapers need no changes. For local emulator testing on Apple Silicon,
-use the **arm64** AVD, sideload an official Firefox APK from
-`archive.mozilla.org/pub/fenix/releases/<ver>/android/...arm64-v8a.apk`, and (on a
-`google_apis` non-Play image) enable remote debugging headlessly via `adb root` +
-setting `pref_key_remote_debugging=true` (and `pref_key_terms_accepted=true` to skip
-onboarding) in `/data/data/org.mozilla.firefox/shared_prefs/fenix_preferences.xml`. iOS is
-unsupported (needs a Safari native-app wrapper).
-
-No build step required.
+No build step required. (A browser extension was removed in favour of the manual-entry
+webpage + proxy; see git history if you need it.)
 
 ## Architecture
 
@@ -62,23 +46,11 @@ Standalone web page (no build step, no framework) that displays DSS (Dutch padel
 - POSTs the 18 scenarios to nlpadel.nl's rekentool form (`__RequestVerificationToken` is single-use; refetch GET → POST per scenario). Runs at concurrency 4. The rekentool requires KNLTB SSO; the same persistent context handles it.
 - `--open` writes a tiny temp redirect page in `os.tmpdir()` and opens *that*, because macOS `open` drops the query string from a `file://…?…` URL (treats it as a literal path). The redirect JS-navigates to the full calculator URL, preserving the query.
 
-**Browser extension** (`extension/`, MV3 — the public, per-user-login delivery):
-- Why an extension and not a hosted site: a hosted page **cannot** use a visitor's KNLTB session (cross-origin CORS + cross-site cookies). Only code in the user's browser with `host_permissions` can. The extension does the whole flow client-side; no server, no shared account.
-- `content.js` runs on `head-2-head*` pages: reads names from the live DOM (`/player/<slug>` anchors), fetches the 4 profiles **same-origin** (so the user's cookies ride along) and parses padel ratings, detects logout (`/user/login` redirect), shows the gender-confirm modal, then messages the background worker and opens the bundled calculator (`chrome.runtime.getURL('calculator/index.html')`) with the query string.
-- `background.js` (service worker) does the 18 nlpadel POSTs — cross-origin fetches must happen here (content-script fetches are CORS-bound to the page origin); `host_permissions` let the worker read the responses.
-- `shared.js` is the browser port of the pure helpers in `scripts/fetch-core.js` (guessGender, normalizeGender, buildNlpadelForm, parseNlpadelResponse, buildCalcQuery, mapWithLimit). **Keep the two in sync** — they're intentionally identical. Written as classic-script functions (no import/export) so they work both as a content script and via `importScripts()` in the worker, like `scenarios.js`.
-- **Two non-obvious gotchas** (both found via `scripts/verify-extension.js`):
-  1. `host_permissions` MUST include `https://id.knltb.nl/*` — nlpadel's GET bounces through an `id.knltb.nl` "checksession" SSO redirect before settling; without permission the worker can't follow it and `fetch` throws "Failed to fetch". (No KNLTB login is needed for nlpadel itself; the browser just carries cookies across the bounce.)
-  2. The nlpadel POST MUST send a `Referer` header — without it, concurrent antiforgery POSTs race and return HTTP 400 (only ~half succeed). With `Referer` + concurrency 4 all 18 succeed, matching the Node version.
-- **Cross-browser background:** the manifest declares BOTH `background.service_worker` (Chrome — only `background.js` loads, so it `importScripts('scenarios.js','shared.js')`) and `background.scripts: [scenarios.js, shared.js, background.js]` (Firefox, which disables `service_worker` in MV3 — the array loads all three into a shared event-page scope). `background.js` guards `importScripts` with `typeof importScripts === 'function'` so it's a no-op under Firefox. Each browser ignores the key it doesn't use. `browser_specific_settings.gecko.id` is set for Firefox. Note: Firefox MV3 may prompt the user to grant `host_permissions` at runtime (Chrome auto-grants).
-- `extension/scenarios.js` and `extension/calculator/` are generated by `npm run sync:ext` (gitignored). `CALC_URL` in `content.js` points at the GitHub Pages calculator (shareable links); switch it to `chrome.runtime.getURL('calculator/index.html')` for a fully offline bundled build.
-- Verified end-to-end against the known-good test match (deltas `w=-0.3408,…`, `g=f,f,m,m`).
-
 **Public manual-entry page + nlpadel proxy** (`proxy/`, `app.js` manual mode):
-- The hosted calculator now doubles as a no-login, no-install tool: the Spelers card has name + rating + ♂/♀ inputs per player and a **Bereken** button. `fetchDeltas` in `app.js` POSTs `{ratings, genders}` to `DELTAS_API`, sets `prefetchedWin/LossDeltas`, and reuses `renderMatrix`. The deep-link path (`?w=&l=` from extension/CLI) is unchanged.
+- The hosted calculator is a no-login, no-install tool: the Spelers card has name + rating + ♂/♀ inputs per player and a **Bereken** button. `fetchDeltas` in `app.js` POSTs `{ratings, genders}` to `DELTAS_API`, sets `prefetchedWin/LossDeltas`, and reuses `renderMatrix`. The deep-link path (`?w=&l=` from the CLI) is unchanged.
 - A browser page **cannot** call nlpadel directly — not auth (nlpadel needs none) but **CORS** (no `Access-Control-Allow-Origin`) + a **`SameSite=Strict; HttpOnly` antiforgery cookie** that never rides cross-site. So `proxy/` is a Cloudflare Worker that relays: `POST /deltas {ratings,genders}` → `{winDeltas,lossDeltas}`. Anonymous, stateless, no secrets.
-- `proxy/nlpadel-core.mjs` is host-agnostic (global `fetch`, no Playwright). It mirrors `buildNlpadelForm`/`parseNlpadelResponse`/scenarios (now a **3rd copy** alongside `fetch-core.js` and `extension/shared.js` — keep identical). Its one new piece is `jarFetch`: a manual redirect-follower that carries cookies through nlpadel's `id.knltb.nl` SSO bounce (plain `fetch` fails there with "redirect count exceeded"). `fetchAllDeltas` gets the token once, then POSTs the 18 scenarios serially with retry + `Referer`.
-- `DELTAS_API` in `app.js` must point at the deployed Worker URL (like the extension's `CALC_URL`); the hosted page is non-functional until it does. Verified in Node: `worker.fetch()` + `nlpadel-core` reproduce the known-good 18 deltas against live nlpadel.
+- `proxy/nlpadel-core.mjs` is host-agnostic (global `fetch`, no Playwright). It mirrors `buildNlpadelForm`/`parseNlpadelResponse`/scenarios from `scripts/fetch-core.js` (a 2nd copy — keep identical). Its one new piece is `jarFetch`: a manual redirect-follower that carries cookies through nlpadel's `id.knltb.nl` SSO bounce (plain `fetch` fails there with "redirect count exceeded"). `fetchAllDeltas` gets the antiforgery token once, then POSTs the 18 scenarios serially with retry + `Referer` (concurrent POSTs race into HTTP 400).
+- `DELTAS_API` in `app.js` must point at the deployed Worker URL; the hosted page is non-functional until it does. Verified in Node and live: `worker.fetch()` + `nlpadel-core` reproduce the known-good 18 deltas against live nlpadel.
 
 **Local web app** (`server.js`, `npm start`):
 - Plain Node `http` server (no deps beyond `fetch-core`). Serves the static calculator AND a two-step fetch UI. A static page can't do the fetch itself (CORS + needs the KNLTB session), so the server does all cross-site work server-side via `fetch-core`.
