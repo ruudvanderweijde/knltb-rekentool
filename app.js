@@ -17,8 +17,25 @@ document.addEventListener('DOMContentLoaded', () => {
   applyUrlPrefill();
   const btn = document.getElementById('calcBtn');
   if (btn) btn.addEventListener('click', fetchDeltas);
+  const paste = document.getElementById('pasteBox');
+  if (paste) paste.addEventListener('input', e => parsePasted(e.target.value));
   recalculate();
 });
+
+// Parse a pasted blob into the rating (and optional name) inputs. Picks up to
+// four numbers in 0..11, with an optional leading name before each.
+function parsePasted(text) {
+  const pairs = [...text.matchAll(/([\p{L}][\p{L}\s.'-]*?)?\s*(\d{1,2}(?:[.,]\d+)?)/gu)]
+    .map(m => ({ name: (m[1] || '').trim(), num: parseFloat(m[2].replace(',', '.')) }))
+    .filter(p => Number.isFinite(p.num) && p.num >= 0 && p.num <= 11)
+    .slice(0, 4);
+  if (!pairs.length) return;
+  pairs.forEach((p, i) => {
+    setVal(`r${i + 1}`, String(p.num).replace('.', ','));
+    if (p.name) setVal(`n${i + 1}`, p.name);
+  });
+  recalculate();
+}
 
 function applyUrlPrefill() {
   // Read from both query string and hash so links survive macOS `open` even

@@ -28,7 +28,7 @@ jobs:
       - name: Assemble static site (calculator files only)
         run: |
           mkdir -p _site
-          cp index.html app.js calculator.js config.js scenarios.js style.css _site/
+          cp index.html app.js calculator.js config.js scenarios.js style.css bookmarklet.js _site/
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

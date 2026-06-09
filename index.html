@@ -57,6 +57,16 @@
         <button id="calcBtn" type="button" class="calc-btn">Bereken ratingwijziging</button>
         <span id="calcStatus" class="calc-status"></span>
       </div>
+
+      <details class="quick-fill">
+        <summary>Sneller invoeren</summary>
+        <p class="note">Plak de 4 ratings (bijv. <code>5,5 6 5 4,8</code>, of regels als <code>Marlou 5,5</code>):</p>
+        <textarea id="pasteBox" class="paste-box" rows="2" placeholder="5,5  6  5  4,8"></textarea>
+        <p class="note">Of installeer de <strong>auto-fill knop</strong>: sleep deze link naar je
+          bladwijzerbalk, open dan een mijnknltb <em>head-2-head</em> pagina en klik erop —
+          de ratings worden automatisch opgehaald (desktop; je moet ingelogd zijn bij KNLTB).</p>
+        <p><a class="bookmarklet" href="javascript:(function(){var s=document.createElement('script');s.src='https://ruudvanderweijde.github.io/knltb-rekentool/bookmarklet.js?'+Date.now();document.body.appendChild(s);})();">🎾 Padel rekentool auto-fill</a></p>
+      </details>
     </section>
 
     <section class="card" id="probSection" hidden>

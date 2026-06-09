@@ -22,6 +22,14 @@ ratingwijziging**. Je krijgt de 18 uitslagen met de nieuwe ratings. Werkt op elk
 De ratings typ je zelf in — een gewone webpagina kan ze niet van je mijnknltb-account lezen
 (daarvoor is een login nodig; zie de CLI hieronder).
 
+**Sneller invoeren** (klap *Sneller invoeren* open op de pagina):
+- **Plakveld** — plak de 4 ratings (bijv. `5,5 6 5 4,8`, of regels als `Marlou 5,5`); de
+  velden worden ingevuld. Werkt overal, ook op mobiel.
+- **Auto-fill knop (bookmarklet)** — sleep de link naar je bladwijzerbalk. Open dan een
+  mijnknltb **head-2-head** pagina (ingelogd) en klik erop: de 4 padel-dubbel ratings + namen
+  worden opgehaald en de rekentool opent ingevuld. Desktop; de knop moet als **bladwijzer
+  bewaard** worden (browsers blokkeren `javascript:` in de adresbalk).
+
 > **Over de proxy.** De pagina kan de nlpadel-rekentool niet rechtstreeks aanroepen
 > (browsers blokkeren dat via CORS + een `SameSite=Strict`-cookie — niets met inloggen te
 > maken; nlpadel vereist geen login). Een piepkleine, **anonieme en stateless** proxy

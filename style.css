@@ -194,6 +194,18 @@ input:focus, select:focus {
   color: var(--gray);
 }
 .calc-status { font-size: 13px; color: var(--gray); }
+
+.quick-fill { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 10px; }
+.quick-fill summary { cursor: pointer; font-size: 13px; color: var(--blue); font-weight: 600; }
+.paste-box {
+  width: 100%; box-sizing: border-box; margin: 6px 0;
+  padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px;
+  font-family: monospace; font-size: 13px; resize: vertical;
+}
+.bookmarklet {
+  display: inline-block; padding: 7px 12px; border: 1px dashed var(--orange);
+  border-radius: 6px; color: var(--blue); text-decoration: none; font-weight: 600; font-size: 13px;
+}
 .calc-status.error { color: var(--red); }
 
 .combined-row {
