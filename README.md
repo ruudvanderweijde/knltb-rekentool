@@ -1,5 +1,7 @@
 # KNLTB Padel Rekentool
 
+### 👉 [Open de rekentool](https://ruudvanderweijde.github.io/knltb-rekentool/)
+
 Bereken de DSS-ratingwijziging per uitslag voor een padel-dubbelpartij: vul de vier
 *padel-dubbel* ratings in en zie wat elke score met je rating doet. De 18 uitslag-scenario's
 komen van de officiële [nlpadel.nl rekentool][rekentool].
