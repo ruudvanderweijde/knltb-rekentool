@@ -33,8 +33,8 @@ export default {
     }
 
     const ratings = (body.ratings || []).map(Number);
-    if (ratings.length !== 4 || ratings.some(r => !Number.isFinite(r) || r < 1 || r > 12)) {
-      return json({ error: 'Geef 4 ratings tussen 1 en 12.' }, 400);
+    if (ratings.length !== 4 || ratings.some(r => !Number.isFinite(r) || r < 0 || r > 11)) {
+      return json({ error: 'Geef 4 ratings tussen 0 en 11.' }, 400);
     }
     const genders = Array.isArray(body.genders) && body.genders.length === 4
       ? body.genders

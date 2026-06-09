@@ -82,7 +82,7 @@ function recalculate() {
   const R3 = parseRating('r3');
   const R4 = parseRating('r4');
 
-  const allValid = [R1, R2, R3, R4].every(r => !isNaN(r) && r >= 1 && r <= 12);
+  const allValid = [R1, R2, R3, R4].every(r => !isNaN(r) && r >= 0 && r <= 11);
 
   updateCombined('r12', R1, R2);
   updateCombined('r34', R3, R4);
@@ -104,8 +104,8 @@ function recalculate() {
 // recompute from the inputs on click.
 async function fetchDeltas() {
   const ratings = ['r1', 'r2', 'r3', 'r4'].map(parseRating);
-  if (!ratings.every(r => !isNaN(r) && r >= 1 && r <= 12)) {
-    setStatus('Vul eerst 4 geldige ratings in (1–12).', true);
+  if (!ratings.every(r => !isNaN(r) && r >= 0 && r <= 11)) {
+    setStatus('Vul eerst 4 geldige ratings in (0–11).', true);
     return;
   }
   const btn = document.getElementById('calcBtn');
@@ -197,7 +197,7 @@ function parseRating(id) {
 
 function updateCombined(elemId, Ra, Rb) {
   const el = document.getElementById(elemId);
-  if (!isNaN(Ra) && !isNaN(Rb) && Ra >= 1 && Ra <= 12 && Rb >= 1 && Rb <= 12) {
+  if (!isNaN(Ra) && !isNaN(Rb) && Ra >= 0 && Ra <= 11 && Rb >= 0 && Rb <= 11) {
     el.textContent = fmt(DSS_CONFIG.theta * Ra + (1 - DSS_CONFIG.theta) * Rb);
   } else {
     el.textContent = '—';
@@ -211,5 +211,8 @@ function setVisible(id, visible) {
 
 function pct(prob)    { return Math.round(prob * 100); }
 function fmt(n)       { return n.toFixed(4); }
-function fmtDelta(d)  { return (d >= 0 ? '+' : '') + d.toFixed(4); }
-function deltaClass(d){ return d < 0 ? 'delta-good' : 'delta-bad'; }
+// Treat negative zero (e.g. team 2's -delta of a +0 team-1 delta) as negative, so
+// it renders as "-0.0000" in green instead of "+0.0000" in red.
+function isNeg(d)     { return d < 0 || Object.is(d, -0); }
+function fmtDelta(d)  { return (isNeg(d) ? '-' : '+') + Math.abs(d).toFixed(4); }
+function deltaClass(d){ return isNeg(d) ? 'delta-good' : 'delta-bad'; }

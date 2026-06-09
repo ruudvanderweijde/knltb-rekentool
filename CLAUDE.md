@@ -63,6 +63,6 @@ Standalone web page (no build step, no framework) that displays DSS (Dutch padel
 
 ## Domain notes
 
-- **Lower rating = better.** Scale runs ~1 (professional) → ~9 (beginner). Real-world KNLTB ratings can exceed 9 — input validation accepts up to 12.
+- **Lower rating = better.** Scale runs **0 → 11** (lower = stronger). Input validation (app.js + proxy worker.js) accepts `0..11`.
 - Calculator URL format: `index.html?R1=...&R2=...&R3=...&R4=...&n=name1,...,name4&g=m,m,v,v&w=d1,...,d9&l=d1,...,d9`. `n` is up to 4 URL-encoded player names (blank → "Speler N" fallback); `g` is one gender letter per player (`m`/`v`, shown as ♂/♀). The `w`/`l` arrays are signed deltas with 4 decimals, in the order defined by `scenarios.js`.
 - Zero-sum: `delta_team1 + delta_team2 = 0` always. The UI shows `delta_team2 = −delta_team1`.
