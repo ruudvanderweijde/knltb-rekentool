@@ -4,7 +4,7 @@ const PLAYER_NAMES = [...DEFAULT_PLAYER_NAMES];
 // Anonymous, stateless proxy that fetches the nlpadel deltas (needed only to get
 // around the browser's CORS + SameSite rules; no login/secrets). Override for
 // local testing, e.g. http://localhost:8787/deltas
-const DELTAS_API = 'https://knltb-rekentool-proxy.workers.dev/deltas';
+const DELTAS_API = 'https://knltb-rekentool-proxy.ruudvanderweijde.workers.dev/deltas';
 
 let prefetchedWinDeltas  = null; // array of 9 numbers or null
 let prefetchedLossDeltas = null;
