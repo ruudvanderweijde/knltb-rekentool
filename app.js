@@ -180,7 +180,8 @@ async function fetchDeltas() {
   }
   const btn = document.getElementById('calcBtn');
   btn.disabled = true;
-  setStatus('Bezig met berekenen via nlpadel…');
+  setVisible('calcSpinner', true);
+  setStatus('Bezig met berekenen via nlpadel… (±8 sec)');
   try {
     const resp = await fetch(DELTAS_API, {
       method: 'POST',
@@ -200,6 +201,7 @@ async function fetchDeltas() {
     setStatus(`Mislukt: ${err.message}`, true);
   } finally {
     btn.disabled = false;
+    setVisible('calcSpinner', false);
   }
 }
 

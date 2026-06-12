@@ -195,6 +195,22 @@ input:focus, select:focus {
 }
 .calc-status { font-size: 13px; color: var(--gray); }
 
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--blue-light);
+  border-top-color: var(--orange);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+}
+.spinner[hidden] { display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation-duration: 2s; }
+}
+
 .quick-fill { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 10px; }
 .quick-fill summary { cursor: pointer; font-size: 13px; color: var(--blue); font-weight: 600; }
 .paste-box {
