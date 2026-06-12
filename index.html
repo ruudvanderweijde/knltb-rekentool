@@ -88,6 +88,13 @@
       <h2>Ratingwijziging per uitslag</h2>
       <p class="note">Lager = beter &middot; <span class="delta-good">groen = verbetering</span> &middot; <span class="delta-bad">rood = verslechtering</span> &middot; bron: nlpadel.nl rekentool</p>
 
+      <div class="share-row">
+        <input type="text" id="shareUrl" class="share-input" readonly aria-label="Deelbare link">
+        <button id="shareBtn" type="button" class="calc-btn share-btn">🔗 Kopieer link</button>
+        <span id="shareStatus" class="calc-status"></span>
+      </div>
+      <p class="note">Deel deze link — de ontvanger ziet dezelfde uitslag zonder zelf te hoeven berekenen.</p>
+
       <div class="matrix-group">
         <h3 class="group-header win-header">Team 1 wint</h3>
         <div class="table-wrapper">

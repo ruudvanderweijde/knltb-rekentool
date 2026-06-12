@@ -19,6 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btn) btn.addEventListener('click', fetchDeltas);
   const paste = document.getElementById('pasteBox');
   if (paste) paste.addEventListener('input', e => parsePasted(e.target.value));
+  const share = document.getElementById('shareBtn');
+  if (share) share.addEventListener('click', copyShareLink);
   recalculate();
 });
 
@@ -113,7 +115,58 @@ function recalculate() {
 
   const result = calcPadel(R1, R2, R3, R4);
   renderProbability(result);
-  if (hasPrefetch) renderMatrix(R1, R2, R3, R4);
+  if (hasPrefetch) {
+    renderMatrix(R1, R2, R3, R4);
+    updateShareUrl();
+  }
+}
+
+// Build a self-contained deep link carrying the ratings, names, genders and the
+// fetched deltas, so a recipient sees the full result without fetching anything.
+// Byte-compatible with the CLI's buildCalcQuery so links round-trip identically.
+function buildShareUrl() {
+  const ratings = ['r1', 'r2', 'r3', 'r4'].map(parseRating);
+  if (!ratings.every(r => !isNaN(r) && r >= 0 && r <= 11)) return null;
+  if (!prefetchedWinDeltas || !prefetchedLossDeltas) return null;
+  const names = [1, 2, 3, 4].map(i => {
+    const el = document.getElementById(`n${i}`);
+    return (el && el.value.trim()) || '';
+  });
+  const genders = readGenders().map(g => (g === 'female' ? 'v' : 'm'));
+  const query = [
+    `R1=${ratings[0]}`, `R2=${ratings[1]}`, `R3=${ratings[2]}`, `R4=${ratings[3]}`,
+    `n=${names.map(n => encodeURIComponent(n)).join(',')}`,
+    `g=${genders.join(',')}`,
+    `w=${prefetchedWinDeltas.map(d => d.toFixed(4)).join(',')}`,
+    `l=${prefetchedLossDeltas.map(d => d.toFixed(4)).join(',')}`,
+  ].join('&');
+  return `${location.origin}${location.pathname}?${query}`;
+}
+
+function updateShareUrl() {
+  const input = document.getElementById('shareUrl');
+  if (!input) return;
+  const url = buildShareUrl();
+  input.value = url || '';
+}
+
+async function copyShareLink() {
+  const input = document.getElementById('shareUrl');
+  const url = input && input.value;
+  if (!url) return;
+  try {
+    await navigator.clipboard.writeText(url);
+    setShareStatus('Gekopieerd!');
+  } catch {
+    // Clipboard API blocked (e.g. insecure context) — fall back to select.
+    if (input.select) { input.select(); input.setSelectionRange(0, url.length); }
+    setShareStatus('Selecteer en kopieer (Ctrl/Cmd+C).');
+  }
+}
+
+function setShareStatus(text) {
+  const el = document.getElementById('shareStatus');
+  if (el) el.textContent = text;
 }
 
 // Fetch the 18 deltas from the proxy for the current ratings + genders, then

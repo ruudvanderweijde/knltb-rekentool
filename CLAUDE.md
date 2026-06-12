@@ -34,6 +34,7 @@ Standalone web page (no build step, no framework) that displays DSS (Dutch padel
 **Web UI** (`index.html`, `app.js`, `style.css`):
 - `app.js` reads `R1..R4` and pre-fetched deltas (`w`, `l`) from the URL query string (also accepts hash, for resilience to macOS `open` quirks).
 - Renders combined ratings + win probability locally; renders the 18-row delta table only when pre-fetched data is present. Without pre-fetched data, shows a hint pointing at the CLI.
+- **Shareable link**: once deltas are present, `buildShareUrl()` reconstructs a self-contained deep link (`?R..&n=&g=&w=&l=`) and shows it in a read-only field with a "Kopieer link" button (`copyShareLink` → `navigator.clipboard`, falls back to select-on-insecure-context). It is byte-compatible with the CLI's `buildCalcQuery` (names via `encodeURIComponent`, deltas `toFixed(4)`), so share links and CLI links round-trip identically through `applyUrlPrefill`. The recipient needs no proxy call.
 - KNLTB brand colors: blue `#003087`, orange `#F47920`.
 
 **KNLTB / nlpadel integration** (`scripts/fetch-core.js` — shared module):

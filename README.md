@@ -22,6 +22,11 @@ ratingwijziging**. Je krijgt de 18 uitslagen met de nieuwe ratings. Werkt op elk
 De ratings typ je zelf in — een gewone webpagina kan ze niet van je mijnknltb-account lezen
 (daarvoor is een login nodig; zie de CLI hieronder).
 
+**Deelbare link.** Na *Bereken ratingwijziging* verschijnt boven de tabel een link met de
+knop **🔗 Kopieer link**. Die link bevat de spelers, ratings, geslachten én de opgehaalde
+uitslagen — stuur 'm door en de ontvanger ziet exact dezelfde tabel, zonder zelf te
+berekenen (geen proxy-call nodig).
+
 **Sneller invoeren** (klap *Sneller invoeren* open op de pagina):
 - **Plakveld** — plak de 4 ratings (bijv. `5,5 6 5 4,8`, of regels als `Marlou 5,5`); de
   velden worden ingevuld. Werkt overal, ook op mobiel.
