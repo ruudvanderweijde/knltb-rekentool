@@ -8,7 +8,9 @@ komen van de officiële [nlpadel.nl rekentool][rekentool].
 
 > **Onofficieel.** Niet gelieerd aan of goedgekeurd door de KNLTB of nlpadel. Gebruik op
 > eigen risico en respecteer de voorwaarden van de KNLTB. Er worden geen accounts of
-> persoonsgegevens opgeslagen.
+> persoonsgegevens opgeslagen. Voor anonieme bezoekersstatistieken gebruikt de pagina
+> [Cloudflare Web Analytics](https://www.cloudflare.com/web-analytics/) — cookieloos, geen
+> persoonsgegevens, geen tracking tussen sites.
 
 [rekentool]: https://www.nlpadel.nl/alles-over-padel/speel-padel/speelsterkte-rating/speelsterkte-rekentool/
 
