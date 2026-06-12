@@ -62,10 +62,26 @@
         <summary>Sneller invoeren</summary>
         <p class="note">Plak de 4 ratings (bijv. <code>5,5 6 5 4,8</code>, of regels als <code>Marlou 5,5</code>):</p>
         <textarea id="pasteBox" class="paste-box" rows="2" placeholder="5,5  6  5  4,8"></textarea>
-        <p class="note">Of installeer de <strong>auto-fill knop</strong>: sleep deze link naar je
-          bladwijzerbalk, open dan een mijnknltb <em>head-2-head</em> pagina en klik erop —
-          de ratings worden automatisch opgehaald (desktop; je moet ingelogd zijn bij KNLTB).</p>
-        <p><a class="bookmarklet" href="javascript:(function(){var s=document.createElement('script');s.src='https://ruudvanderweijde.github.io/knltb-rekentool/bookmarklet.js?'+Date.now();document.body.appendChild(s);})();">🎾 Padel rekentool auto-fill</a></p>
+        <p class="note"><strong>Auto-fill knop (desktop)</strong> — haalt de 4 ratings + namen
+          automatisch op van een mijnknltb <em>head-2-head</em> pagina. Het is een
+          <em>bladwijzer</em>, geen gewone knop: hier klikken doet niets, je moet 'm eerst
+          installeren.</p>
+        <ol class="bm-steps">
+          <li>Toon je bladwijzerbalk: <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd>.</li>
+          <li><strong>Sleep</strong> de oranje knop hieronder omhoog naar die balk en laat los.</li>
+          <li>Ga (ingelogd) naar een mijnknltb <em>head-2-head</em> pagina en klik op de bladwijzer in de balk.</li>
+          <li>De rekentool opent in een nieuw tabblad, alvast ingevuld — controleer ♂/♀ en klik <em>Bereken</em>.</li>
+        </ol>
+        <p class="bm-drag">
+          <a class="bookmarklet" href="javascript:(function(){var s=document.createElement('script');s.src='https://ruudvanderweijde.github.io/knltb-rekentool/bookmarklet.js?'+Date.now();document.body.appendChild(s);})();">🎾 Padel rekentool auto-fill</a>
+          <span class="bm-hint">↑ sleep mij naar je bladwijzerbalk</span>
+        </p>
+        <details class="bm-manual">
+          <summary>Lukt slepen niet?</summary>
+          <p class="note">Maak handmatig een nieuwe bladwijzer aan (rechtsklik op de balk →
+            <em>Pagina toevoegen…</em>), geef 'm een naam, en plak dit exact als <em>URL/adres</em>:</p>
+          <textarea class="paste-box" rows="3" readonly onclick="this.select()">javascript:(function(){var s=document.createElement('script');s.src='https://ruudvanderweijde.github.io/knltb-rekentool/bookmarklet.js?'+Date.now();document.body.appendChild(s);})();</textarea>
+        </details>
       </details>
     </section>
 

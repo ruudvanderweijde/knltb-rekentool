@@ -205,7 +205,21 @@ input:focus, select:focus {
 .bookmarklet {
   display: inline-block; padding: 7px 12px; border: 1px dashed var(--orange);
   border-radius: 6px; color: var(--blue); text-decoration: none; font-weight: 600; font-size: 13px;
+  cursor: grab; background: #fff7f0;
 }
+.bookmarklet:active { cursor: grabbing; }
+.bm-steps {
+  margin: 8px 0 8px 18px; padding: 0; font-size: 13px; color: var(--text);
+}
+.bm-steps li { margin: 3px 0; }
+.bm-steps kbd {
+  font-family: monospace; font-size: 11px; background: var(--bg);
+  border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px;
+}
+.bm-drag { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 4px 0; }
+.bm-hint { font-size: 12px; color: var(--gray); font-style: italic; }
+.bm-manual { margin-top: 8px; }
+.bm-manual summary { cursor: pointer; font-size: 12px; color: var(--blue); }
 .calc-status.error { color: var(--red); }
 
 .share-row {
